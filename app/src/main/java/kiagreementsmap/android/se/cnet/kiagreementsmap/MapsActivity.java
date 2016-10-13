@@ -3,9 +3,13 @@ package kiagreementsmap.android.se.cnet.kiagreementsmap;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -13,6 +17,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
@@ -31,19 +36,50 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarkerClickListener, OnMapReadyCallback {
 
     public static final String TAG = MapsActivity.class.getSimpleName();
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     protected OkHttpClient client = new OkHttpClient();
     private AgreementMap mAgreementMap;
     private GoogleMap mMap;
-
+    public BottomSheetBehavior behavior = new BottomSheetBehavior();
+    public View bottomSheet;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        //View bottomSheet = findViewById(R.id.design_bottom_sheet);
+        //final BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
+        bottomSheet = findViewById(R.id.design_bottom_sheet);
+        behavior = BottomSheetBehavior.from(bottomSheet);
+        behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        Log.i("BottomSheetCallback", "BottomSheetBehavior.STATE_DRAGGING");
+                        break;
+                    case BottomSheetBehavior.STATE_SETTLING:
+                        Log.i("BottomSheetCallback", "BottomSheetBehavior.STATE_SETTLING");
+                        break;
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        Log.i("BottomSheetCallback", "BottomSheetBehavior.STATE_EXPANDED");
+                        break;
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        Log.i("BottomSheetCallback", "BottomSheetBehavior.STATE_COLLAPSED");
+                        break;
+                    case BottomSheetBehavior.STATE_HIDDEN:
+                        Log.i("BottomSheetCallback", "BottomSheetBehavior.STATE_HIDDEN");
+                        break;
+                }
+            }
 
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                Log.i("BottomSheetCallback", "slideOffset: " + slideOffset);
+            }
+        });
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -169,6 +205,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
+        // Set a listener for marker click.
+        mMap.setOnMarkerClickListener(this);
+
     }
 
     public void updateMap(){
@@ -180,8 +220,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if(!lat.isEmpty() && !lng.isEmpty()){
                 LatLng position = new LatLng(Double.parseDouble(lat.replace(",", ".")), Double.parseDouble(lng.replace(",", ".")));
                 mMap.addMarker(new MarkerOptions().position(position).title(u.getNamn() + " " + u.getLand()));
+
             }
         }
+    }
+
+    @Override
+    public boolean onMarkerClick(final Marker marker) {
+        TextView textView = (TextView) bottomSheet.findViewById(R.id.bottomsheet_text);
+        textView.setText(marker.getTitle());
+
+        if (behavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        } else {
+            behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
+
+        // Retrieve the data from the marker.
+        /*Integer clickCount = (Integer) marker.getTag();
+
+        // Check if a click count was set, then display the click count.
+        if (clickCount != null) {
+            clickCount = clickCount + 1;
+            marker.setTag(clickCount);
+            Toast.makeText(this,
+                    marker.getTitle() +
+                            " has been clicked " + clickCount + " times.",
+                    Toast.LENGTH_SHORT).show();
+        }*/
+        Toast.makeText(this,
+                marker.getTitle() +
+                        " has been clicked ",
+                Toast.LENGTH_SHORT).show();
+
+        Log.d(TAG, marker.getTitle());
+
+
+
+        // Return false to indicate that we have not consumed the event and that we wish
+        // for the default behavior to occur (which is for the camera to move such that the
+        // marker is centered and for the marker's info window to open, if it has one).
+        return false;
     }
 
 }
