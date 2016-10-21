@@ -1,15 +1,20 @@
 package kiagreementsmap.android.se.cnet.kiagreementsmap;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +31,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import kiagreementsmap.android.se.cnet.kiagreementsmap.model.Agreement;
 import kiagreementsmap.android.se.cnet.kiagreementsmap.model.AgreementMap;
@@ -46,8 +53,9 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
     protected OkHttpClient client = new OkHttpClient();
     private AgreementMap mAgreementMap;
     private GoogleMap mMap;
+    private Map<Marker, University> allMarkersMap = new HashMap<Marker, University>();
     public BottomSheetBehavior behavior = new BottomSheetBehavior();
-    public View bottomSheet;
+    public RelativeLayout bottomSheet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +63,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
         setContentView(R.layout.activity_maps);
         //View bottomSheet = findViewById(R.id.design_bottom_sheet);
         //final BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
-        bottomSheet = findViewById(R.id.design_bottom_sheet);
+        bottomSheet = (RelativeLayout) findViewById(R.id.design_bottom_sheet);
         behavior = BottomSheetBehavior.from(bottomSheet);
         behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
@@ -134,17 +142,30 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
                     String responseStr = response.body().string();
                     Log.d(TAG, responseStr);
                     try {
-                        UniversityInfo mUniversityInfo = parseUniversityInfo(responseStr);
+                        final UniversityInfo mUniversityInfo = parseUniversityInfo(responseStr);
                         Log.d(TAG, "After university");
+                        Log.d(TAG, mUniversityInfo.getKIBenamning());
 
-                        /*
+
                         //Run in main thread
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                updateMap();
+                                TextView textView = (TextView) bottomSheet.findViewById(R.id.bottomsheet_text);
+                                int views = bottomSheet.getChildCount();
+                                Log.d(TAG, "----- Nr views: " + views);
+                                if(views > 1) {
+                                    bottomSheet.removeViewAt(1);
+                                }
+                                textView.setText(mUniversityInfo.getName() + " " + mUniversityInfo.getKIBenamning() + " - " + mUniversityInfo.getLandNamn());
+                                TextView urlTexView = new TextView(bottomSheet.getContext());
+                                urlTexView.setText(mUniversityInfo.getWWWadress());
+                                urlTexView.setPaddingRelative(5, 50, 5, 0);
+                                urlTexView.setTextColor(ContextCompat.getColor(bottomSheet.getContext(), R.color.colorText));
+                                bottomSheet.addView(urlTexView);
+
                             }
-                        });*/
+                        });
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -326,20 +347,28 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
             if(!lat.isEmpty() && !lng.isEmpty()){
                 LatLng position = new LatLng(Double.parseDouble(lat.replace(",", ".")), Double.parseDouble(lng.replace(",", ".")));
                 Marker marker = mMap.addMarker(new MarkerOptions().position(position).title(u.getNamn() + " " + u.getLand()));
+                allMarkersMap.put(marker, u);
             }
         }
     }
 
+    public void updateBottomSheet(UniversityInfo universityInfo){
+        TextView textView = (TextView) bottomSheet.findViewById(R.id.bottomsheet_text);
+        textView.setText(universityInfo.getName());
 
+    }
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
+        University uni = allMarkersMap.get(marker);
+        try {
+            getUniversityInfo(uni.getId());
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
+        }
         TextView textView = (TextView) bottomSheet.findViewById(R.id.bottomsheet_text);
-        textView.setText(marker.getTitle() + " - Aliquam consectetur, enim eget finibus pellentesque, nisl orci bibendum nibh, at tincidunt magna libero sit amet urna. Nullam eu nibh dictum, vestibulum dui non, sagittis dui. Maecenas viverra, lectus eget facilisis ultricies, tellus nisi ultricies risus, eu scelerisque nunc elit vitae nisi. Sed aliquam nulla ac dui fermentum, nec tincidunt dolor condimentum. Phasellus euismod et massa et molestie. Vivamus sed lectus quis est gravida volutpat. Suspendisse luctus metus id felis rhoncus tincidunt. Etiam maximus a ligula at cursus. Donec egestas mauris vel augue mollis blandit.\n" +
-                "\n" +
-                "Fusce elementum quis metus id consectetur. Vivamus ut enim justo. Ut suscipit, libero eget tincidunt ullamcorper, est odio varius dui, vitae rutrum nunc leo id lacus. Aliquam eget neque bibendum, vulputate neque eu, mollis urna. Nullam sed tristique nibh, eget egestas enim. Integer id gravida leo, non commodo ligula. Praesent id ipsum ut mi pellentesque vestibulum non a lorem.\n" +
-                "\n" +
-                "Ut congue, ante quis rhoncus tincidunt, sapien justo posuere justo, porta tempus ipsum sem ornare quam. In hac habitasse platea dictumst. Nunc hendrerit, eros sit amet ornare commodo, leo dolor blandit enim, ut consequat tortor purus ut lectus. Curabitur elit nunc, laoreet et mollis a, imperdiet eget urna. Mauris ullamcorper, velit nec maximus hendrerit, leo purus faucibus diam, venenatis sollicitudin lectus lorem ac diam. Mauris lacinia leo ac tincidunt scelerisque. Donec et arcu malesuada turpis venenatis lobortis id sit amet nibh. Proin vitae finibus est, at semper orci. Morbi tincidunt lacus felis, sed tincidunt massa lobortis vitae. Aliquam laoreet ligula non elit pretium, in egestas mi tristique. Aliquam risus purus, semper sed turpis at, suscipit faucibus sem. Pellentesque elementum orci in metus tempus, sit amet gravida felis commodo. Proin faucibus erat purus, eu maximus risus congue non. Sed pulvinar augue sem. Ut pretium ultrices tortor, id condimentum sapien elementum eget. Sed id enim dolor. Nullam commodo, massa in tristique cursus, erat ex rutrum diam, sed placerat neque tellus sit amet nibh. Vestibulum luctus aliquet sollicitudin. Curabitur vitae condimentum nisi. Nam maximus eget nisi eget hendrerit. Aliquam a cursus lorem. Ut ultricies erat ex, quis bibendum ipsum imperdiet ac. Vestibulum a placerat enim. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in risus nec nisi luctus posuere. Morbi consequat mi sed turpis ornare semper. Sed vel nunc id massa faucibus dignissim id egestas felis. Nulla ut felis fermentum, blandit nunc id, iaculis velit. Integer auctor velit eget risus convallis, in ultrices urna elementum. Donec nec libero at erat molestie dignissim id nec eros. Donec iaculis efficitur diam vitae sollicitudin. Suspendisse potenti. In at cursus velit. Mauris egestas commodo arcu eu convallis. In eleifend elit eget neque fringilla, vitae venenatis lectus pellentesque. Mauris vitae fringilla sapien.");
+        textView.setText(marker.getTitle() + " - " + uni.getId() + " loading ... ");
 
         if (behavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
             behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
