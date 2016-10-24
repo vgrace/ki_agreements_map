@@ -14,6 +14,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,6 +57,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
     private Map<Marker, University> allMarkersMap = new HashMap<Marker, University>();
     public BottomSheetBehavior behavior = new BottomSheetBehavior();
     public RelativeLayout bottomSheet;
+    public LinearLayout bottomSheetContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +66,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
         //View bottomSheet = findViewById(R.id.design_bottom_sheet);
         //final BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
         bottomSheet = (RelativeLayout) findViewById(R.id.design_bottom_sheet);
+        bottomSheetContent = (LinearLayout) findViewById(R.id.bottom_sheet_content);
+
         behavior = BottomSheetBehavior.from(bottomSheet);
         behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
@@ -160,7 +164,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
                                 textView.setText(mUniversityInfo.getName() + " " + mUniversityInfo.getKIBenamning() + " - " + mUniversityInfo.getLandNamn());
                                 TextView urlTexView = new TextView(bottomSheet.getContext());
                                 urlTexView.setText(mUniversityInfo.getWWWadress());
-                                urlTexView.setPaddingRelative(5, 50, 5, 0);
+                                urlTexView.setPaddingRelative(5, 160, 5, 0);
                                 urlTexView.setTextColor(ContextCompat.getColor(bottomSheet.getContext(), R.color.colorText));
                                 bottomSheet.addView(urlTexView);
 
@@ -193,14 +197,17 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
                 +"}";
 
         post(url, bodyJson, new Callback() {
+
             @Override
             public void onFailure(Call call, IOException e) {
                 // Something went wrong
+                Log.d(TAG, "Something went wrong");
                 Log.d(TAG, e.getMessage());
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                Log.d(TAG, "Responce");
                 if (response.isSuccessful()) {
                     String responseStr = response.body().string();
                     Log.d(TAG, responseStr);
@@ -350,12 +357,6 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
                 allMarkersMap.put(marker, u);
             }
         }
-    }
-
-    public void updateBottomSheet(UniversityInfo universityInfo){
-        TextView textView = (TextView) bottomSheet.findViewById(R.id.bottomsheet_text);
-        textView.setText(universityInfo.getName());
-
     }
 
     @Override

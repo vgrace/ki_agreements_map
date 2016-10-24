@@ -40,14 +40,29 @@ https://developers.google.com/maps/documentation/android/map#using_xml_attribute
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+            <LinearLayout
+                android:id="@+id/bottom_sheet_content"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:background="@drawable/border"
+                android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/bottomsheet_text"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text=""
-                android:textSize="15sp"
-                android:textColor="@color/colorText"/>
+                <TextView
+                    android:id="@+id/bottomsheet_head"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Karolinska Institutet"
+                    android:textSize="24sp"
+                    android:textColor="@color/colorText"/>
+
+                <TextView
+                    android:id="@+id/bottomsheet_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="test"
+                    android:textSize="15sp"
+                    android:textColor="@color/colorText"/>
+            </LinearLayout>
         </android.support.v4.widget.NestedScrollView>
 
 
