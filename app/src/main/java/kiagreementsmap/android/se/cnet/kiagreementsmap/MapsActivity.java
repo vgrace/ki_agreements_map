@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -62,6 +63,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
     private Map<Marker, University> allMarkersMap = new HashMap<Marker, University>();
     public BottomSheetBehavior behavior = new BottomSheetBehavior();
     public LinearLayout bottomSheet;
+    private ImageView arrowImageView;
     //public LinearLayout bottomSheetContent;
     private Context mContext;
 
@@ -74,6 +76,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
         //final BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
         mContext = this;
         bottomSheet = (LinearLayout) findViewById(R.id.design_bottom_sheet);
+
         //bottomSheetContent = (LinearLayout) findViewById(R.id.bottom_sheet_content);
 
         behavior = BottomSheetBehavior.from(bottomSheet);
@@ -88,15 +91,18 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
                         Log.i("BottomSheetCallback", "BottomSheetBehavior.STATE_SETTLING");
                         break;
                     case BottomSheetBehavior.STATE_EXPANDED:
+                        changeArrowImage(true);
                         Log.i("BottomSheetCallback", "BottomSheetBehavior.STATE_EXPANDED");
                         break;
                     case BottomSheetBehavior.STATE_COLLAPSED:
+                        changeArrowImage(false);
                         Log.i("BottomSheetCallback", "BottomSheetBehavior.STATE_COLLAPSED");
                         break;
                     case BottomSheetBehavior.STATE_HIDDEN:
                         Log.i("BottomSheetCallback", "BottomSheetBehavior.STATE_HIDDEN");
                         break;
                 }
+
             }
 
             @Override
@@ -109,6 +115,18 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        arrowImageView = (ImageView) bottomSheet.findViewById(R.id.arrowImageView);
+        arrowImageView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Image button clicked!");
+                boolean open = openCloseBottomSheet();
+                changeArrowImage(open);
+
+                //Toast.makeText(MapsActivity.this, "You clicked on ImageView", Toast.LENGTH_LONG).show();
+            }
+        });
         //Get University locations
         try {
             getUniversities();
@@ -118,6 +136,26 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
             Log.d(TAG, "-------------------------- ERROR RETRIEVING UNIS");
             Log.e(TAG, e.getMessage());
         }
+    }
+
+    public void changeArrowImage(boolean open){
+        if(open) {
+            arrowImageView.setImageResource(R.drawable.arrowdown);
+        }
+        else{
+            arrowImageView.setImageResource(R.drawable.arrowup);
+        }
+    }
+    public boolean openCloseBottomSheet(){
+        boolean open = false;
+        if (behavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            open = true;
+        } else {
+            behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            open = false;
+        }
+        return open;
     }
 
     public void setGridViewAdapter(final Context context, Agreement[] agreements){
@@ -383,14 +421,18 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
 
         if (behavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
             behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        } else {
-            behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
+        /*else {
+            behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }*/
 
-        Toast.makeText(this,
-                marker.getTitle() +
-                        " has been clicked ",
-                Toast.LENGTH_SHORT).show();
+        //boolean open = openCloseBottomSheet();
+        changeArrowImage(true);
+
+        //Toast.makeText(this,
+                //marker.getTitle() +
+                       // " has been clicked ",
+                //Toast.LENGTH_SHORT).show();
 
         Log.d(TAG, marker.getTitle());
 
