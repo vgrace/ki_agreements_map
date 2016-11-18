@@ -21,52 +21,82 @@ https://developers.google.com/maps/documentation/android/map#using_xml_attribute
               map:mapType="normal"/>
 
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/design_bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="500dp"
+        android:orientation="vertical"
         android:background="@color/colorBackground"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
         app:behavior_hideable="true"
-        app:behavior_peekHeight="50dp"
+        app:behavior_peekHeight="80dp"
         app:elevation="4dp"
         app:layout_behavior="@string/bottom_sheet_behavior">
 
-        <android.support.v4.widget.NestedScrollView
+        <TextView
+            android:id="@+id/bottomsheet_head"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Information om lärosäte/organisation och avtal"
+            android:textSize="20sp"
+            android:paddingBottom="@dimen/header_vertical_margin"
+            android:textColor="@color/colorAccent"/>
+
+        <TextView
+            android:text="Lärosäte/organisation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView"
+            android:textSize="18sp"
+            android:paddingTop="@dimen/text_vertical_margin"
+            android:paddingBottom="@dimen/text_vertical_margin"
+            android:textColor="@color/colorAccent"/>
+
+        <TextView
+            android:text="Universitetet i Bergen"
+            android:textSize="17sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/orgNameTextView"
+            android:paddingBottom="@dimen/text_vertical_margin"
+            android:textColor="@color/colorTextDark"/>
+
+        <TextView
+            android:text="Ulriksdal 8 C, 5009 Bergen - Norway"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/text_vertical_margin"
+            android:id="@+id/orgAddressTextView"/>
+
+        <TextView
+            android:text="http://www.uib.no"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/orgLinkTextView"/>
+
+        <TextView
+            android:text="Gällande avtal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:paddingTop="@dimen/header_vertical_margin"
+            android:paddingBottom="@dimen/header_vertical_margin"
+            android:textColor="@color/colorAccent"
+            android:id="@+id/textView4"/>
+
+        <GridView
+            android:id="@+id/gridview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-            <LinearLayout
-                android:id="@+id/bottom_sheet_content"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:background="@drawable/border"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:id="@+id/bottomsheet_head"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Karolinska Institutet"
-                    android:textSize="24sp"
-                    android:textColor="@color/colorText"/>
-
-                <TextView
-                    android:id="@+id/bottomsheet_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="test"
-                    android:textSize="15sp"
-                    android:textColor="@color/colorText"/>
-            </LinearLayout>
-        </android.support.v4.widget.NestedScrollView>
-
-
-
-    </RelativeLayout>
+            android:gravity="center"
+            android:columnWidth="100dp"
+            android:verticalSpacing="@dimen/header_vertical_margin"
+            android:horizontalSpacing="0dp"
+            android:stretchMode="columnWidth"
+            android:numColumns="1"/>
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

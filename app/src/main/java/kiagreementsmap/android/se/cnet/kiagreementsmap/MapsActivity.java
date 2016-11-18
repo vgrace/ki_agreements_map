@@ -14,6 +14,8 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -23,6 +25,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -32,6 +35,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,17 +61,20 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
     private GoogleMap mMap;
     private Map<Marker, University> allMarkersMap = new HashMap<Marker, University>();
     public BottomSheetBehavior behavior = new BottomSheetBehavior();
-    public RelativeLayout bottomSheet;
-    public LinearLayout bottomSheetContent;
+    public LinearLayout bottomSheet;
+    //public LinearLayout bottomSheetContent;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         //View bottomSheet = findViewById(R.id.design_bottom_sheet);
         //final BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
-        bottomSheet = (RelativeLayout) findViewById(R.id.design_bottom_sheet);
-        bottomSheetContent = (LinearLayout) findViewById(R.id.bottom_sheet_content);
+        mContext = this;
+        bottomSheet = (LinearLayout) findViewById(R.id.design_bottom_sheet);
+        //bottomSheetContent = (LinearLayout) findViewById(R.id.bottom_sheet_content);
 
         behavior = BottomSheetBehavior.from(bottomSheet);
         behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
@@ -104,12 +112,19 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
         //Get University locations
         try {
             getUniversities();
-            getUniversityInfo(1024);
+            getUniversityInfo(1056);
 
         } catch (IOException e) {
             Log.d(TAG, "-------------------------- ERROR RETRIEVING UNIS");
             Log.e(TAG, e.getMessage());
         }
+    }
+
+    public void setGridViewAdapter(final Context context, Agreement[] agreements){
+        //Add agreements to GridView
+        GridView gridView = (GridView)findViewById(R.id.gridview);
+        final GridViewAdapter personalityAdapter = new GridViewAdapter(this, agreements);
+        gridView.setAdapter(personalityAdapter);
     }
 
     protected Call post(String url, String json, Callback callback) {
@@ -155,18 +170,17 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                TextView textView = (TextView) bottomSheet.findViewById(R.id.bottomsheet_text);
-                                int views = bottomSheet.getChildCount();
-                                Log.d(TAG, "----- Nr views: " + views);
-                                if(views > 1) {
-                                    bottomSheet.removeViewAt(1);
-                                }
-                                textView.setText(mUniversityInfo.getName() + " " + mUniversityInfo.getKIBenamning() + " - " + mUniversityInfo.getLandNamn());
-                                TextView urlTexView = new TextView(bottomSheet.getContext());
-                                urlTexView.setText(mUniversityInfo.getWWWadress());
-                                urlTexView.setPaddingRelative(5, 160, 5, 0);
-                                urlTexView.setTextColor(ContextCompat.getColor(bottomSheet.getContext(), R.color.colorText));
-                                bottomSheet.addView(urlTexView);
+
+                                TextView orgName = (TextView) bottomSheet.findViewById(R.id.orgNameTextView);
+                                orgName.setText(mUniversityInfo.getName());
+
+                                TextView orgAddress = (TextView) bottomSheet.findViewById(R.id.orgAddressTextView);
+                                orgAddress.setText(mUniversityInfo.getAdress() + ", " + mUniversityInfo.getOrt() + " - " + mUniversityInfo.getLandNamn());
+
+                                TextView orgLink = (TextView) bottomSheet.findViewById(R.id.orgLinkTextView);
+                                orgLink.setText(mUniversityInfo.getWWWadress());
+                                Log.d(TAG, "Agreements: " + mUniversityInfo.getAgreements().length);
+                                setGridViewAdapter(mContext, mUniversityInfo.getAgreements());
 
                             }
                         });
@@ -182,8 +196,6 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
             }
         });
     }
-
-
 
     private void getUniversities() throws IOException {
         String url = "http://alhambra.it.ki.se/AgreementReports/AgreementReportService.asmx/GetUniversities";
@@ -327,9 +339,9 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng aarhus = new LatLng(60.3796396, 5.3632918);
+        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(aarhus));
 
         // Set a listener for marker click.
         mMap.setOnMarkerClickListener(this);
@@ -353,7 +365,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
             String lng = u.getLngCoord().trim();
             if(!lat.isEmpty() && !lng.isEmpty()){
                 LatLng position = new LatLng(Double.parseDouble(lat.replace(",", ".")), Double.parseDouble(lng.replace(",", ".")));
-                Marker marker = mMap.addMarker(new MarkerOptions().position(position).title(u.getNamn() + " " + u.getLand()));
+                Marker marker = mMap.addMarker(new MarkerOptions().position(position).title(u.getNamn() + " " + u.getLand()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
                 allMarkersMap.put(marker, u);
             }
         }
@@ -368,8 +380,6 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
             e.printStackTrace();
             Log.e(TAG, e.getMessage());
         }
-        TextView textView = (TextView) bottomSheet.findViewById(R.id.bottomsheet_text);
-        textView.setText(marker.getTitle() + " - " + uni.getId() + " loading ... ");
 
         if (behavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
             behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
@@ -377,26 +387,12 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
             behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
 
-        // Retrieve the data from the marker.
-        /*Integer clickCount = (Integer) marker.getTag();
-
-        // Check if a click count was set, then display the click count.
-        if (clickCount != null) {
-            clickCount = clickCount + 1;
-            marker.setTag(clickCount);
-            Toast.makeText(this,
-                    marker.getTitle() +
-                            " has been clicked " + clickCount + " times.",
-                    Toast.LENGTH_SHORT).show();
-        }*/
         Toast.makeText(this,
                 marker.getTitle() +
                         " has been clicked ",
                 Toast.LENGTH_SHORT).show();
 
         Log.d(TAG, marker.getTitle());
-
-
 
         // Return false to indicate that we have not consumed the event and that we wish
         // for the default behavior to occur (which is for the camera to move such that the

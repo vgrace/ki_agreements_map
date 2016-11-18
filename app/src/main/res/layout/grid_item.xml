@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <TextView
+        android:text="Utbildningsavtal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/textView2"
+        android:paddingBottom="@dimen/text_vertical_margin"
+        android:textColor="@color/colorTextDark"/>
+
+    <TextView
+        android:text="Läsår:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView2"
+        android:layout_alignParentStart="true"
+        android:id="@+id/itemYearTextViewLbl"/>
+
+    <TextView
+        android:text="Utbildningsprogram:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/itemYearTextViewLbl"
+        android:layout_alignParentStart="true"
+        android:id="@+id/itemEducationTextViewLbl"/>
+
+    <TextView
+        android:text="Utbytesprogram:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/itemEducationTextViewLbl"
+        android:layout_alignParentStart="true"
+        android:id="@+id/itemExchangeTextViewLbl"/>
+
+    <TextView
+        android:text="Avtalsägare:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/itemExchangeTextViewLbl"
+        android:layout_alignParentStart="true"
+        android:id="@+id/itemAgreementTextViewLbl"/>
+
+    <TextView
+        android:text="Utgångsdatum:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/itemAgreementTextViewLbl"
+        android:layout_alignParentStart="true"
+        android:id="@+id/itemDateTextViewLbl"/>
+
+    <TextView
+        android:text="Nivå:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/itemDateTextViewLbl"
+        android:layout_alignParentStart="true"
+        android:id="@+id/itemLevelTextViewLbl"/>
+
+    <!-- VALUES -->
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView2"
+        android:paddingLeft="2dp"
+        android:layout_toEndOf="@+id/itemYearTextViewLbl"
+        android:id="@+id/itemYearTextView"
+        android:textColor="@color/colorTextDark"/>
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/itemEducationTextView"
+        android:paddingLeft="2dp"
+        android:layout_below="@+id/itemYearTextView"
+        android:layout_toEndOf="@+id/itemEducationTextViewLbl"
+        android:textColor="@color/colorTextDark"/>
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="2dp"
+        android:layout_below="@+id/itemEducationTextView"
+        android:layout_toEndOf="@+id/itemExchangeTextViewLbl"
+        android:id="@+id/itemExchangeTextView"
+        android:textColor="@color/colorTextDark"/>
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="2dp"
+        android:layout_below="@+id/itemExchangeTextView"
+        android:layout_toEndOf="@+id/itemAgreementTextViewLbl"
+        android:id="@+id/itemAgreementTextView"
+        android:textColor="@color/colorTextDark"/>
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="2dp"
+        android:layout_below="@+id/itemAgreementTextView"
+        android:layout_toEndOf="@+id/itemDateTextViewLbl"
+        android:id="@+id/itemDateTextView"
+        android:textColor="@color/colorTextDark"/>
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="2dp"
+        android:layout_below="@+id/itemDateTextView"
+        android:layout_toEndOf="@+id/itemLevelTextViewLbl"
+        android:id="@+id/itemLevelTextView"
+        android:textColor="@color/colorTextDark"/>
+</RelativeLayout>
